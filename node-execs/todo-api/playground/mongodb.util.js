@@ -16,6 +16,7 @@ mongoClient.connect(url_A + mongodbProjName, (err, db) =>{
     assert.equal(null, err);
     console.log("Connected :-)");
 
+    // Create --- Start
     // db.collection('Computers').insertOne({
     //     "brand": "Apple",
     //     "name": "MacBook Pro"
@@ -23,6 +24,9 @@ mongoClient.connect(url_A + mongodbProjName, (err, db) =>{
     //     assert.equal(null,err);
     //     console.log(JSON.stringify(res.ops,undefined,2));
     // });
+    // Create --- End
+
+    // Retrieve --- Start
     var objID = new mongoObjectID('58b220f3f078d424af9461bb');
     db.collection('Computers').find({_id: objID }).toArray().then((doc)=>{
         console.log('doc: ' + JSON.stringify(doc,undefined,2));
@@ -30,11 +34,36 @@ mongoClient.connect(url_A + mongodbProjName, (err, db) =>{
         console.log('err', err);
     });
 
-    db.collection('Computers').find().count().then((count)=>{
-        console.log('count: ' + count);
+
+    // db.collection('Computers').find().count().then((count)=>{
+    //     console.log('count: ' + count);
+    // },(err)=>{
+    //     console.log('err', err);
+    // });
+    // Retrieve --- End
+    db.collection('Computers').updateOne(
+        {
+            _id: objID
+        },
+        {
+            $set: {
+                name: 'MacBook Pro 15'
+            }
+        },
+        {
+            returnOriginal: false
+        }).then((resp) => {
+            console.log("Response: " + JSON.stringify(resp, undefined, 2));
+        });
+
+
+    var objID = new mongoObjectID('58b220f3f078d424af9461bb');
+    db.collection('Computers').find({_id: objID }).toArray().then((doc)=>{
+        console.log('doc: ' + JSON.stringify(doc,undefined,2));
     },(err)=>{
         console.log('err', err);
     });
+
 
     db.close();
 });
