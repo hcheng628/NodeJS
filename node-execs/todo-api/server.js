@@ -1,26 +1,12 @@
-var mongoose = require('mongoose');
+var {mongoose_client} = require('./utils/mongoose.helper');
+var {Todo} = require('./modules/todo');
+var {User} = require('./modules/user');
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://159.203.206.215:27017/ToDo');
-
-var todoSchema = {
-    text: {
-        type: String
-    },
-    completed:{
-        type: Boolean
-    },
-    completedAt:{
-        type: Number
-    }
-};
-
-var Todo = mongoose.model('Todo', todoSchema);
 
 var newTodo = new Todo({
-    text: 'Play Dota',
+    text: 'Play Dota2',
     completed: false,
-    completedAt: 2017
+    completedAt: 2016
 });
 
 newTodo.save().then((doc)=>{
@@ -29,4 +15,4 @@ newTodo.save().then((doc)=>{
     console.log("Error", JSON.stringify(error, undefined, 2));
 });
 
-mongoose.connection.close()
+mongoose_client.connection.close()
