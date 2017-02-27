@@ -32,7 +32,7 @@ nodeApp.post(endpoint_ToDo_Save, (request, response)=>{
         response.status(statusCode_OK_200).send(doc);
     }, (error)=>{
         console.log(JSON.stringify(error,undefined,2));
-        response.status(statusCode_BadClientRequest_400).send(doc);
+        response.status(statusCode_BadClientRequest_400).send(error);
     });
     // mongoose_client.connection.close()
 });
@@ -43,10 +43,10 @@ nodeApp.get(endpoint_ToDo_GetAll, (request, response)=>{
     
     Todo.find().then((todos)=>{
         console.log("Todos: " + JSON.stringify(todos,undefined,2));
-        response.send(todos);
+        response.send({todos});
     }).catch((error)=>{
         console.log("Error: " + JSON.stringify(error,undefined,2));
-        response.send(error);
+        response.send({error});
     });
     // mongoose_client.connection.close()
 });
