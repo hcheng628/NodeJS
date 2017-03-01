@@ -13,6 +13,7 @@ const statusCode_BadClientRequest_400 = 400;
 
 const endpoint_ToDo_Save = '/todos';
 const endpoint_ToDo_GetAll = '/todos';
+const endpoint_User_GetAll = '/todos';
 
 
 var nodeApp = express();
@@ -34,7 +35,6 @@ nodeApp.post(endpoint_ToDo_Save, (request, response)=>{
         console.log(JSON.stringify(error,undefined,2));
         response.status(statusCode_BadClientRequest_400).send(error);
     });
-    // mongoose_client.connection.close()
 });
 
 nodeApp.get(endpoint_ToDo_GetAll, (request, response)=>{
@@ -48,8 +48,11 @@ nodeApp.get(endpoint_ToDo_GetAll, (request, response)=>{
         console.log("Error: " + JSON.stringify(error,undefined,2));
         response.send({error});
     });
-    // mongoose_client.connection.close()
 });
+
+nodeApp.get(){
+
+}
 
 nodeApp.listen(nodeApp_Port, ()=>{
     console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
