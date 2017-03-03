@@ -18,6 +18,7 @@ const endpoint_ToDo_Save = '/todos';
 const endpoint_ToDo_GetAll = '/todos';
 const endpoint_ToDo_GetByID = '/todos/:id';
 
+const endpoint_ToDo_DeleteByID = '/todos/:id';
 const endpoint_User_GetAll = '/todos';
 
 
@@ -71,8 +72,25 @@ nodeApp.get(endpoint_ToDo_GetByID,(request, response)=>{
   });
 });
 
+nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
+  if(!ObjectID.isValid(request.params.id)){
+    response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
+  }
+
+  Todo.findByIdAndRemove({ _id: request.params.id}).then((doc)=>{
+    if(doc == null){
+      response.status(statusCode_NotFound_404).send();
+    }else{
+      response.status(statusCode_OK_200).send(doc);
+    }
+  }).catch((err)=>{
+    response.status(statusCode_ServerError_500).send(err);
+  });
+});
+
+
 nodeApp.listen(nodeApp_Port, ()=>{
-    // console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
+    console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
 });
 
 module.exports = {
