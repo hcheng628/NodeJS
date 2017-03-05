@@ -14,6 +14,10 @@ const todos = [{
 }
 ];
 
+var oneTodo = {
+  text: "3st Todo"
+};
+
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
         return Todo.insertMany(todos);
@@ -97,5 +101,65 @@ describe('Test Todo APIs', ()=>{
             .expect(400)
             .end(done);
       });
+  });
+
+  describe('test UPDATE',()=>{
+    it('should UPDATE a todo & statusCode_OK_200',(done)=>{
+      var text = 'Writing Node Test Cases';
+      request(server.nodeApp)
+      .patch('/todos/' + todos[0]._id.toHexString())
+      .send({ text })
+      .expect((returnVal)=>{
+        // console.log('---------: ' + JSON.stringify(returnVal.body,undefined,2));
+        expect(returnVal.body.text).toBeA('string').toBe(text);
+      })
+      .expect(200)
+      .end(done);
+    });
+
+    it('should not UPDATE a todo & 404',(done)=>{
+      var tempText = {
+        text: 'Writing Node Test Cases'
+      };
+      request(server.nodeApp)
+      .patch('/todos/' + new ObjectID().toHexString())
+      .send({tempText})
+      .expect(404)
+      .end(done);
+    });
+
+    it('should not UPDATE a todo',(done)=>{
+      var tempText = {
+        text: 'Writing Node Test Cases'
+      };
+      request(server.nodeApp)
+      .patch('/todos/' + '123')
+      .send({tempText})
+      .expect(400)
+      .end(done);
+    });
+  });
+
+  describe('test DELETE',()=>{
+    it('should DELETE a todo',(done)=>{
+      request(server.nodeApp)
+      .delete('/todos/' + todos[0]._id.toHexString())
+      .expect(200)
+      .end(done);
+    });
+
+    it('should fail DELETE & statusCode_NotFound_404',(done)=>{
+      request(server.nodeApp)
+      .delete('/todos/' + new ObjectID().toHexString())
+      .expect(404)
+      .end(done);
+    });
+
+    it('should fail DELETE & statusCode_BadClientRequest_400',(done)=>{
+      request(server.nodeApp)
+      .delete('/todos/' + 'BADINPUT')
+      .expect(400)
+      .end(done);
+    });
   });
 });

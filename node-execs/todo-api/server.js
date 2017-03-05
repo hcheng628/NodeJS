@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
+var _ = require('lodash');
 
 var {mongoose_client} = require('./utils/mongoose.helper');
 var {Todo} = require('./modules/todo');
@@ -13,12 +14,11 @@ const statusCode_BadClientRequest_400 = 400;
 const statusCode_NotFound_404 = 404;
 const statusCode_ServerError_500 = 500;
 
-
 const endpoint_ToDo_Save = '/todos';
 const endpoint_ToDo_GetAll = '/todos';
 const endpoint_ToDo_GetByID = '/todos/:id';
-
-const endpoint_ToDo_DeleteByID = '/todos/:id';
+const endpoint_ToDo_UpdateByID = endpoint_ToDo_GetByID;
+const endpoint_ToDo_DeleteByID = endpoint_ToDo_GetByID;
 const endpoint_User_GetAll = '/todos';
 
 
@@ -36,7 +36,7 @@ nodeApp.post(endpoint_ToDo_Save, (request, response)=>{
 
     newTodo.save().then((doc)=>{
         // console.log(JSON.stringify(doc,undefined,2));
-        response.status(statusCode_OK_200).send(doc);
+        response.send(doc);
     }, (error)=>{
         // console.log(JSON.stringify(error,undefined,2));
         response.status(statusCode_BadClientRequest_400).send(error);
@@ -63,12 +63,50 @@ nodeApp.get(endpoint_ToDo_GetByID,(request, response)=>{
   }
   Todo.findById(request.params.id).then((doc)=>{
     if(doc){
-      response.status(statusCode_OK_200).send(doc);
+      response.send(doc);
     }else{
       response.status(statusCode_NotFound_404).send();
     }
   }).catch((err)=>{
       response.status(statusCode_ServerError_500).send();
+  });
+});
+
+nodeApp.patch(endpoint_ToDo_UpdateByID,(request, response)=>{
+  if(!ObjectID.isValid(request.params.id)){
+    response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
+  }
+  var updateDoc;
+  Todo.findById(request.params.id).then((doc)=>{
+    if(doc){
+      updateDoc = doc;
+    }else{
+      response.status(statusCode_NotFound_404).send();
+    }
+  }).catch((err)=>{
+    // console.log("Error Here :-(");
+    response.status(statusCode_ServerError_500).send(err);
+  });
+
+  var updateBody = _.pick(request.body, ['text','completed']);
+  // console.log("Checking: " + JSON.stringify(updateBody,undefined,2));
+  if(updateBody.completed == 'true'){
+    updateBody.completedAt = new Date().getTime();
+  }else{
+    updateBody.completedAt = null;
+    updateBody.completed = false;
+  }
+  // console.log("Updated: " + JSON.stringify(updateBody,undefined,2));
+  Todo.findByIdAndUpdate(request.params.id,{ $set: updateBody},{new: true})
+  .then((doc)=>{
+    if(doc == null){
+      response.status(statusCode_NotFound_404).send();
+    }else{
+      response.send(doc);
+    }
+  })
+  .catch((err)=>{
+    response.status(statusCode_ServerError_500).send(err);
   });
 });
 
@@ -81,16 +119,15 @@ nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
     if(doc == null){
       response.status(statusCode_NotFound_404).send();
     }else{
-      response.status(statusCode_OK_200).send(doc);
+      response.send(doc);
     }
   }).catch((err)=>{
     response.status(statusCode_ServerError_500).send(err);
   });
 });
 
-
 nodeApp.listen(nodeApp_Port, ()=>{
-    console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
+    // console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
 });
 
 module.exports = {
