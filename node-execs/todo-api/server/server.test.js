@@ -123,12 +123,12 @@ describe('Test Todo APIs', ()=>{
       };
       request(server.nodeApp)
       .patch('/todos/' + new ObjectID().toHexString())
-      .send({tempText})
+      //.send({tempText})
       .expect(404)
       .end(done);
     });
 
-    it('should not UPDATE a todo',(done)=>{
+    it('should not UPDATE a todo & statusCode_BadClientRequest_400',(done)=>{
       var tempText = {
         text: 'Writing Node Test Cases'
       };
@@ -141,6 +141,7 @@ describe('Test Todo APIs', ()=>{
   });
 
   describe('test DELETE',()=>{
+
     it('should DELETE a todo',(done)=>{
       request(server.nodeApp)
       .delete('/todos/' + todos[0]._id.toHexString())

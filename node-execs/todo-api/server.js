@@ -74,18 +74,19 @@ nodeApp.get(endpoint_ToDo_GetByID,(request, response)=>{
 
 nodeApp.patch(endpoint_ToDo_UpdateByID,(request, response)=>{
   if(!ObjectID.isValid(request.params.id)){
-    response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
+    return response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
   }
   var updateDoc;
-  Todo.findById(request.params.id).then((doc)=>{
+  Todo.findById(request.params.id)
+  .then((doc)=>{
     if(doc){
       updateDoc = doc;
     }else{
-      response.status(statusCode_NotFound_404).send();
+      return response.status(statusCode_NotFound_404).send();
     }
   }).catch((err)=>{
     // console.log("Error Here :-(");
-    response.status(statusCode_ServerError_500).send(err);
+    return response.status(statusCode_ServerError_500).send(err);
   });
 
   var updateBody = _.pick(request.body, ['text','completed']);
@@ -100,7 +101,7 @@ nodeApp.patch(endpoint_ToDo_UpdateByID,(request, response)=>{
   Todo.findByIdAndUpdate(request.params.id,{ $set: updateBody},{new: true})
   .then((doc)=>{
     if(doc == null){
-      response.status(statusCode_NotFound_404).send();
+      return response.status(statusCode_NotFound_404).send();
     }else{
       response.send(doc);
     }
@@ -112,12 +113,13 @@ nodeApp.patch(endpoint_ToDo_UpdateByID,(request, response)=>{
 
 nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
   if(!ObjectID.isValid(request.params.id)){
-    response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
+    // console.log("This is Invalid ObjectID");
+    return response.status(statusCode_BadClientRequest_400).send('Invalid ObjectID');
   }
-
+  // console.log("This is Invalid ObjectID and Still Keep Going");
   Todo.findByIdAndRemove({ _id: request.params.id}).then((doc)=>{
     if(doc == null){
-      response.status(statusCode_NotFound_404).send();
+      return response.status(statusCode_NotFound_404).send();
     }else{
       response.send(doc);
     }
