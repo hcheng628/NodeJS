@@ -22,18 +22,33 @@ const endpoint_ToDo_DeleteByID = endpoint_ToDo_GetByID;
 const endpoint_User_GetAll = '/todos';
 
 
+const endpoint_User_Save = '/users';
+
+
+
 var nodeApp = express();
 nodeApp.use(bodyParser.json());
+
+nodeApp.post(endpoint_User_Save,(request, response)=>{
+  var newUser = new User({
+    email: request.body.email,
+    password: request.body.password
+  });
+  newUser.save()
+  .then((doc)=>{
+    response.send({doc});
+  }).catch((err)=>{
+    response.status(statusCode_ServerError_500).send({err});
+  });
+});
 
 
 nodeApp.post(endpoint_ToDo_Save, (request, response)=>{
     // console.log('Entering: ' + endpoint_ToDo_Save + '.....');
     // console.log('Body Info: ' + JSON.stringify(request.body,undefined,2));
-
     var newTodo = new Todo({
         text: request.body.text
     });
-
     newTodo.save().then((doc)=>{
         // console.log(JSON.stringify(doc,undefined,2));
         response.send(doc);
@@ -128,8 +143,14 @@ nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
   });
 });
 
+
+
+
+
+
+
 nodeApp.listen(nodeApp_Port, ()=>{
-    // console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
+    console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
 });
 
 module.exports = {
