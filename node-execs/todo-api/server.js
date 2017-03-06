@@ -34,10 +34,25 @@ nodeApp.post(endpoint_User_Save,(request, response)=>{
     email: request.body.email,
     password: request.body.password
   });
+  var globDoc;
   newUser.save()
   .then((doc)=>{
-    response.send({doc});
-  }).catch((err)=>{
+    // response.send({doc});
+    globDoc = doc;
+    return newUser.generateAuthToken();
+    // .then((returnToken)=>{
+    //   console.log('Return: ' + returnToken);
+    //   console.log('Return newUser Update: ' + newUser.tokens[0].token);
+    // });
+    // console.log('Checking Token: ' + user.tokens[0].token);
+  })
+  .then((token)=>{
+    // console.log('Token:' + token);
+    console.log('Then: .....');
+    return response.header('x-auth', token).send(globDoc);
+  })
+  .catch((err)=>{
+    console.log('Error: .....');
     response.status(statusCode_ServerError_500).send({err});
   });
 });
