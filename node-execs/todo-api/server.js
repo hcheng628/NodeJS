@@ -13,6 +13,7 @@ const statusCode_OK_200 = 200;
 const statusCode_BadClientRequest_400 = 400;
 const statusCode_NotFound_404 = 404;
 const statusCode_ServerError_500 = 500;
+const statusCode_UnAuthorized_401 = 401;
 
 const endpoint_ToDo_Save = '/todos';
 const endpoint_ToDo_GetAll = '/todos';
@@ -23,11 +24,27 @@ const endpoint_User_GetAll = '/todos';
 
 
 const endpoint_User_Save = '/users';
-
+const endpoint_User_me_Get = '/users/me';
 
 
 var nodeApp = express();
 nodeApp.use(bodyParser.json());
+
+
+nodeApp.get(endpoint_User_me_Get,(request, response)=> {
+  console.log('Hello users/me URI.....');
+  // Request -> Header -> token => FindByToken
+  var token = request.get('x-auth');
+  console.log('Header Token: ' + token);
+  User.findByToken(token).then((user)=>{
+    console.log('Sending user: ' + JSON.stringify(user,undefined,2));
+    response.send(user);
+  }).catch((err)=>{
+    console.log('users/me Error: ' + JSON.stringify(err,undefined,2));
+    response.status(statusCode_UnAuthorized_401).send(err);
+  });
+});
+
 
 nodeApp.post(endpoint_User_Save,(request, response)=>{
   var newUser = new User({
@@ -56,6 +73,8 @@ nodeApp.post(endpoint_User_Save,(request, response)=>{
     response.status(statusCode_ServerError_500).send({err});
   });
 });
+
+
 
 
 nodeApp.post(endpoint_ToDo_Save, (request, response)=>{
@@ -157,10 +176,6 @@ nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
     response.status(statusCode_ServerError_500).send(err);
   });
 });
-
-
-
-
 
 
 
