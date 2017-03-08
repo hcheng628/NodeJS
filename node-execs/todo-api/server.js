@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
 var _ = require('lodash');
+var {authenticate} = require('./middleware/authenticate');
+
 
 var {mongoose_client} = require('./utils/mongoose.helper');
 var {Todo} = require('./modules/todo');
@@ -31,18 +33,10 @@ var nodeApp = express();
 nodeApp.use(bodyParser.json());
 
 
-nodeApp.get(endpoint_User_me_Get,(request, response)=> {
-  console.log('Hello users/me URI.....');
-  // Request -> Header -> token => FindByToken
-  var token = request.get('x-auth');
-  console.log('Header Token: ' + token);
-  User.findByToken(token).then((user)=>{
-    console.log('Sending user: ' + JSON.stringify(user,undefined,2));
-    response.send(user);
-  }).catch((err)=>{
-    console.log('users/me Error: ' + JSON.stringify(err,undefined,2));
-    response.status(statusCode_UnAuthorized_401).send(err);
-  });
+
+nodeApp.get(endpoint_User_me_Get, authenticate, (request, response)=> {
+  // console.log('request: ' + JSON.stringify(request,undefined,2));
+  response.send(request.user);
 });
 
 
