@@ -24,7 +24,6 @@ const endpoint_ToDo_UpdateByID = endpoint_ToDo_GetByID;
 const endpoint_ToDo_DeleteByID = endpoint_ToDo_GetByID;
 const endpoint_User_GetAll = '/todos';
 
-
 const endpoint_User_Save = '/users';
 const endpoint_User_me_Get = '/users/me';
 
@@ -36,6 +35,7 @@ nodeApp.use(bodyParser.json());
 
 nodeApp.get(endpoint_User_me_Get, authenticate, (request, response)=> {
   // console.log('request: ' + JSON.stringify(request,undefined,2));
+  // console.log('request: ', request);
   response.send(request.user);
 });
 

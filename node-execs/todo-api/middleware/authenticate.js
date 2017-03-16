@@ -2,7 +2,7 @@ var {User} = require('../modules/user');
 
 var authenticate = (req, res, next) => {
   var token = req.get('x-auth');
-  // console.log('Header Token: ' + token);
+  console.log('Header Token: ' + token);
   User.findByToken(token)
   .then((user)=>{
     if(!user){
@@ -15,7 +15,7 @@ var authenticate = (req, res, next) => {
 
     next();
   }).catch((err)=>{
-    res.status(statusCode_UnAuthorized_401).send(err);
+    res.status(401).send(err);
   });
 }
 
