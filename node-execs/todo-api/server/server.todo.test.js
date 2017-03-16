@@ -2,28 +2,24 @@ var expect = require('expect');
 var request = require('supertest');
 var server = require('../server');
 var {ObjectID} = require('mongodb');
-
 var {Todo} = require('../modules/todo');
+var {todos, populateTodos} = require('./seed/seed');
+// const todos = [{
+//     _id: new ObjectID(),
+//     text: "1st Todo"
+// },{
+//     _id: new ObjectID(),
+//     text: "2nd Todo"
+// }];
+//
+//
+// beforeEach((done)=>{
+//     Todo.remove({}).then(()=>{
+//         return Todo.insertMany(todos);
+//     }).then(()=>done());
+// });
 
-const todos = [{
-    _id: new ObjectID(),
-    text: "1st Todo"
-},{
-    _id: new ObjectID(),
-    text: "2nd Todo"
-}
-];
-
-var oneTodo = {
-  text: "3st Todo"
-};
-
-beforeEach((done)=>{
-    Todo.remove({}).then(()=>{
-        return Todo.insertMany(todos);
-    }).then(()=>done());
-});
-
+beforeEach(populateTodos);
 
 describe('Test Todo APIs', ()=>{
   describe("test POST",()=>{
