@@ -9,7 +9,7 @@ var mongodb_collection = 'ToDo';
 // mongodb setup --- end
 
 mongoose_client.Promise = global.Promise;
-mongoose_client.connect(`${mongodb_protocol}://${mongodb_url_local}:${mongodb_port}/${mongodb_collection}`);
+mongoose_client.connect(`${mongodb_protocol}://${mongodb_url_remote}:${mongodb_port}/${mongodb_collection}`);
 
 module.exports = {
     mongoose_client

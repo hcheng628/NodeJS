@@ -59,11 +59,11 @@ nodeApp.post(endpoint_User_Save,(request, response)=>{
   })
   .then((token)=>{
     // console.log('Token:' + token);
-    console.log('Then: .....');
+    // console.log('Then: .....');
     return response.header('x-auth', token).send(globDoc);
   })
   .catch((err)=>{
-    console.log('Error: .....');
+    // console.log('Error: .....');
     response.status(statusCode_ServerError_500).send({err});
   });
 });
@@ -174,7 +174,7 @@ nodeApp.delete(endpoint_ToDo_DeleteByID,(request,response)=>{
 
 
 nodeApp.listen(nodeApp_Port, ()=>{
-    console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
+  console.log(`Node Application Up n' Running @ ${nodeApp_Port}`);
 });
 
 module.exports = {

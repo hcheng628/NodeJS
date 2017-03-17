@@ -19,8 +19,8 @@ describe('Test User APIs', ()=>{
       .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((resp)=>{
-        console.log(resp.body._id);
-        console.log(resp.body.email);
+        // console.log(resp.body._id);
+        // console.log(resp.body.email);
         expect(resp.body._id).toBe(users[0]._id.toHexString());
         expect(resp.body.email).toBe(users[0].email);
         })
@@ -45,9 +45,13 @@ describe('Test User APIs', ()=>{
         email: email,
         password: password
       };
+
+      // console.log({newUser});
+      // console.log({email, password});
+
       request(server.nodeApp)
       .post('/users')
-      .send({newUser})
+      .send({email, password})
       .expect(200)
       .expect((resp)=>{
         expect(resp.body.email).toBe(email);
@@ -60,7 +64,7 @@ describe('Test User APIs', ()=>{
         }
         User.findOne({email: email}).then((res)=>{
           expect(res.email).toBe(email);
-          expect(res.password)toNotBe(password);
+          expect(res.password).toNotBe(password);
           done();
         }).catch((err)=>{
           if(err){
@@ -71,8 +75,34 @@ describe('Test User APIs', ()=>{
       });
     });
     it('it should return a validation error', (done)=>{
+      var email = 'hcheng@hcheng';
+      var password = '123';
+      request(server.nodeApp)
+      .post('/users')
+      .send({email,password})
+      .expect(500)
+      .expect((resp)=>{
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err)=>{
+        if(err) return done(err);
+        done();
+      })
     });
     it('it should not create an user if email in use', (done)=>{
+      var email = 'hcheng@spsu.edu';
+      var password = 'password';
+      request(server.nodeApp)
+      .post('/users')
+      .send({email, password})
+      .expect(500)
+      .expect((resp)=>{
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err)=>{
+        if(err) return done(err);
+        done();
+      });
     });
   });
 });

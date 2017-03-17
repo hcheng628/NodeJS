@@ -2,7 +2,7 @@ var {User} = require('../modules/user');
 
 var authenticate = (req, res, next) => {
   var token = req.get('x-auth');
-  console.log('Header Token: ' + token);
+  // console.log('Header Token: ' + token);
   User.findByToken(token)
   .then((user)=>{
     if(!user){
