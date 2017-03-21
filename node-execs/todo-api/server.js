@@ -26,6 +26,7 @@ const endpoint_User_GetAll = '/todos';
 
 const endpoint_User_Save = '/users';
 const endpoint_User_me_Get = '/users/me';
+const endpoint_User_Login = '/users/login';
 
 
 var nodeApp = express();
@@ -39,6 +40,17 @@ nodeApp.get(endpoint_User_me_Get, authenticate, (request, response)=> {
   response.send(request.user);
 });
 
+nodeApp.post(endpoint_User_Login,(request, response) =>{
+  var body = _.pick(request.body, ['email','password']);
+  User.findByCredentials(body.email, body.password)
+  .then((resp)=>{
+    response.send(resp);
+  }).catch((e)=>{
+    response.status(500).send(e);
+  });
+
+  // console.log('User name: ' + body.email + ' Password: ' + body.password);
+});
 
 nodeApp.post(endpoint_User_Save,(request, response)=>{
   var newUser = new User({

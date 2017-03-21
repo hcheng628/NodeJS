@@ -56,6 +56,41 @@ userSchema.methods.generateAuthToken = function () {
   });
 };
 
+userSchema.statics.findByCredentials = function(email, password){
+  var User = this;
+  return User.findOne({email: email}).then((user)=>{
+    console.log(JSON.stringify(user, undefined, 2));
+
+    if(!user){
+      return Promise.reject('No such E-mail Address Found');
+    }
+
+    return new Promise((resolve, reject)=>{
+      bcrypt.compare(password, user.password, (err, res)=>{
+        if(res === true){
+          console.log('Correct Password');
+          resolve(user);
+        }else{
+          console.log('InCorrect Password');
+          reject('InCorrect Password');
+        }
+      });
+    });
+
+    // return new Promise((resolve, reject) => {
+    //   // Use bcrypt.compare to compare password and user.password
+    //   bcrypt.compare(password, user.password, (err, res) => {
+    //     if (res === true) {
+    //       resolve(user);
+    //     } else {
+    //       reject();
+    //     }
+    //   });
+    // });
+
+  });
+};
+
 userSchema.statics.findByToken =  function(token) {
   // console.log('In findByToken.....');
   var User = this;
