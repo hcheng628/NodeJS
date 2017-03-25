@@ -37,6 +37,68 @@ describe('Test User APIs', ()=>{
     });
   });
 
+  describe('POST /users/login', ()=>{
+    it('it should login', (done)=>{
+      request(server.nodeApp)
+      .post('/users/login')
+      .send({email: users[0].email, password: users[0].password})
+      .expect(200)
+      .expect((resp)=>{
+        expect(resp.body._id).toBe(users[0]._id.toHexString());
+        expect(resp.body.email).toBe(users[0].email);
+        expect(resp.headers['x-auth']).toExist();
+      }).
+      end((err,res)=>{
+        if(err){
+          done(err);
+        }
+        done();
+      });
+    });
+
+    it('it should NOT login InCorrect Password', (done) => {
+      request(server.nodeApp)
+      .post('/users/login')
+      .send({
+        email: users[0].email,
+        password: users[0].password + '1'
+      })
+      .expect(500)
+      .expect((resp)=>{
+        // console.log('---------', resp.error);
+        expect(resp.error.text).toBe('InCorrect Password');
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err,res)=>{
+        if(err){
+          done(err);
+        }
+        done();
+      });
+    });
+    //
+    it('it should NOT login no such E-mail found', (done)=>{
+      request(server.nodeApp)
+      .post('/users/login')
+      .send({
+        email: 'haha' + users[0].email,
+        password: users[0].password
+      })
+      .expect(500)
+      .expect((resp)=>{
+        expect(resp.error.text).toBe('No such E-mail Address Found');
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err,resp)=>{
+        if(err){
+          done(err);
+        }
+        done();
+      })
+    });
+  });
+
+
   describe('POST /users', ()=>{
     it('it should create a user', (done)=>{
       var email = 'hcheng@ksu.edu';
@@ -45,10 +107,8 @@ describe('Test User APIs', ()=>{
         email: email,
         password: password
       };
-
       // console.log({newUser});
       // console.log({email, password});
-
       request(server.nodeApp)
       .post('/users')
       .send({email, password})

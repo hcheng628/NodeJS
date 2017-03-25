@@ -42,10 +42,16 @@ nodeApp.get(endpoint_User_me_Get, authenticate, (request, response)=> {
 
 nodeApp.post(endpoint_User_Login,(request, response) =>{
   var body = _.pick(request.body, ['email','password']);
-  User.findByCredentials(body.email, body.password)
-  .then((resp)=>{
-    response.send(resp);
-  }).catch((e)=>{
+  var thisUser = null;
+  return User.findByCredentials(body.email, body.password)
+  .then((user)=>{
+    thisUser = user;
+    return user.generateAuthToken();
+  })
+  .then((token)=>{
+    response.header('x-auth', token).send(thisUser);
+  })
+  .catch((e)=>{
     response.status(500).send(e);
   });
 
