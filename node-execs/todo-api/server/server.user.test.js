@@ -10,6 +10,73 @@ const {users, populateUsers} = require('./seed/seed');
 beforeEach(populateUsers);
 
 describe('Test User APIs', ()=>{
+  describe('POST /users', ()=>{
+    it('it should create a user', (done)=>{
+      var email = 'hcheng@ksu.edu';
+      var password="password";
+      var newUser = {
+        email: email,
+        password: password
+      };
+      // console.log({newUser});
+      // console.log({email, password});
+      request(server.nodeApp)
+      .post('/users')
+      .send({email, password})
+      .expect(200)
+      .expect((resp)=>{
+        expect(resp.body.email).toBe(email);
+        expect(resp.headers['x-auth']).toExist();
+        expect(resp.body._id).toExist();
+      })
+      .end((err,res)=>{
+        if(err){
+          return done(err);
+        }
+        User.findOne({email: email}).then((res)=>{
+          expect(res.email).toBe(email);
+          expect(res.password).toNotBe(password);
+          done();
+        }).catch((err)=>{
+          if(err){
+            return done(err);
+          }
+          done();
+        });
+      });
+    });
+    it('it should return a validation error', (done)=>{
+      var email = 'hcheng@hcheng';
+      var password = '123';
+      request(server.nodeApp)
+      .post('/users')
+      .send({email,password})
+      .expect(500)
+      .expect((resp)=>{
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err)=>{
+        if(err) return done(err);
+        done();
+      })
+    });
+    it('it should not create an user if email in use', (done)=>{
+      var email = 'hcheng@spsu.edu';
+      var password = 'password';
+      request(server.nodeApp)
+      .post('/users')
+      .send({email, password})
+      .expect(500)
+      .expect((resp)=>{
+        expect(resp.headers['x-auth']).toNotExist();
+      })
+      .end((err)=>{
+        if(err) return done(err);
+        done();
+      });
+    });
+  });
+
   describe('GET /users/me', ()=>{
     it('it should return a user', (done)=>{
       // console.log("Checking..." + users[0].tokens[0].token);
@@ -98,70 +165,29 @@ describe('Test User APIs', ()=>{
     });
   });
 
-
-  describe('POST /users', ()=>{
-    it('it should create a user', (done)=>{
-      var email = 'hcheng@ksu.edu';
-      var password="password";
-      var newUser = {
-        email: email,
-        password: password
-      };
-      // console.log({newUser});
-      // console.log({email, password});
+  describe('DELETE users/me/token', ()=>{
+    it('it should remove a token', (done)=>{
       request(server.nodeApp)
-      .post('/users')
-      .send({email, password})
+      .delete('/users/me/token')
+      .set('x-auth', users[0].tokens[0].token)
       .expect(200)
       .expect((resp)=>{
-        expect(resp.body.email).toBe(email);
-        expect(resp.headers['x-auth']).toExist();
-        expect(resp.body._id).toExist();
+        console.log(JSON.stringify(resp.body, undefined,2));
+        var obj = {};
+        // return Object.keys(obj).length;
+
+        expect(resp.body).toEqual(obj);
       })
       .end((err,res)=>{
         if(err){
-          return done(err);
+          done(err);
         }
-        User.findOne({email: email}).then((res)=>{
-          expect(res.email).toBe(email);
-          expect(res.password).toNotBe(password);
+        User.findOne({email: users[0].email}).then((doc)=>{
+          expect(doc.tokens.length).toBe(0);
           done();
         }).catch((err)=>{
-          if(err){
-            return done(err);
-          }
-          done();
-        });
-      });
-    });
-    it('it should return a validation error', (done)=>{
-      var email = 'hcheng@hcheng';
-      var password = '123';
-      request(server.nodeApp)
-      .post('/users')
-      .send({email,password})
-      .expect(500)
-      .expect((resp)=>{
-        expect(resp.headers['x-auth']).toNotExist();
-      })
-      .end((err)=>{
-        if(err) return done(err);
-        done();
-      })
-    });
-    it('it should not create an user if email in use', (done)=>{
-      var email = 'hcheng@spsu.edu';
-      var password = 'password';
-      request(server.nodeApp)
-      .post('/users')
-      .send({email, password})
-      .expect(500)
-      .expect((resp)=>{
-        expect(resp.headers['x-auth']).toNotExist();
-      })
-      .end((err)=>{
-        if(err) return done(err);
-        done();
+          done(err);
+        })
       });
     });
   });
