@@ -18,15 +18,21 @@ const users = [{
 },{
   _id: userTwoID,
   email: 'hcheng@spsu.edu',
-  password: 'password2'
+  password: 'password2',
+  tokens:[{
+    access: 'auth',
+    token: jwt.sign({ _id: userTwoID.toHexString(), access: 'auth'}, 'user_sercet').toString()
+  }]
 }];
 
 const todos = [{
     _id: new ObjectID(),
-    text: "1st Todo"
+    text: "1st Todo",
+    _creator: userOneID.toHexString()
 },{
     _id: new ObjectID(),
-    text: "2nd Todo"
+    text: "2nd Todo",
+    _creator: userTwoID.toHexString()
 }];
 
 const populateTodos = (done) =>{

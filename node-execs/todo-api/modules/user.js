@@ -56,22 +56,40 @@ userSchema.methods.generateAuthToken = function () {
   });
 };
 
+userSchema.methods.removeToken = function(token){
+  var user = this;
+  return user.update({
+    $pull: {
+      tokens: {
+        token: token
+      }
+    }
+  }
+  // , (err, numAffected)=>{
+  //   if(err){
+  //     return Promise.reject('Error Delete Token');
+  //   }
+  //   return Promise.resolve(numAffected);
+  // }
+);
+}
+
 userSchema.statics.findByCredentials = function(email, password){
   var User = this;
   return User.findOne({email: email}).then((user)=>{
     console.log(JSON.stringify(user, undefined, 2));
 
-    if(!user){
+    if(user== null){
       return Promise.reject('No such E-mail Address Found');
     }
 
     return new Promise((resolve, reject)=>{
       bcrypt.compare(password, user.password, (err, res)=>{
         if(res === true){
-          console.log('Correct Password');
+          // console.log('Correct Password');
           resolve(user);
         }else{
-          console.log('InCorrect Password');
+          // console.log('InCorrect Password');
           reject('InCorrect Password');
         }
       });
