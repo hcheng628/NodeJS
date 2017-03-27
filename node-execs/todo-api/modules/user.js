@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.toJSON = function() {
   var user = this;
   var userObj = user.toObject();
-  console.log("Overwrite toJson Called");
+  // console.log("Overwrite toJson Called");
   return _.pick(userObj, ['_id','email']);
 }
 
@@ -47,7 +47,7 @@ userSchema.methods.generateAuthToken = function () {
   // console.log('In generateAuthToken Func..... ');
   var user = this;
   var access = 'auth';
-  var token = jwt.sign({ _id: user._id.toHexString(), access}, 'user_sercet').toString();
+  var token = jwt.sign({ _id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
   // console.log('Generating Token: ' + token);
   user.tokens.push({access, token});
   // console.log('Checking user: ' + JSON.stringify(user, undefined, 2));
@@ -77,7 +77,7 @@ userSchema.methods.removeToken = function(token){
 userSchema.statics.findByCredentials = function(email, password){
   var User = this;
   return User.findOne({email: email}).then((user)=>{
-    console.log(JSON.stringify(user, undefined, 2));
+    // console.log(JSON.stringify(user, undefined, 2));
 
     if(user== null){
       return Promise.reject('No such E-mail Address Found');
@@ -90,7 +90,7 @@ userSchema.statics.findByCredentials = function(email, password){
           resolve(user);
         }else{
           // console.log('InCorrect Password');
-          reject('InCorrect Password');
+          reject('Incorrect Password');
         }
       });
     });
@@ -115,7 +115,7 @@ userSchema.statics.findByToken =  function(token) {
   var decodeToken;
   try{
     // console.log('In findByToken..... B');
-    decodeToken = jwt.verify(token, 'user_sercet');
+    decodeToken = jwt.verify(token, process.env.JWT_SECRET);
   } catch(err){
     // console.log('In findByToken.....C');
     return Promise.reject('Can not verify Access Token');
