@@ -1,0 +1,1 @@
+http://production.shippingapis.com/ShippingAPITest.dll?API=Verify&XML=%3CAddressValidateRequest%20USERID%3D'697CRIF04334'%3E%3CAddress%20ID%3D'0'%3E%3CAddress1%3E%3C%2FAddress1%3E%3CAddress2%3E6406%20Ivy%20Lane%3C%2FAddress2%3E%3CCity%3EGreenbelt%3C%2FCity%3E%3CState%3EMD%3C%2FState%3E%3CZip5%3E%3C%2FZip5%3E%3CZip4%3E%3C%2FZip4%3E%3C%2FAddress%3E%3C%2FAddressValidateRequest%3E
